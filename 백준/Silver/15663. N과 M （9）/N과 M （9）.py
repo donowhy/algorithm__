@@ -4,22 +4,19 @@ L = list(map(int, input().split()))
 L.sort()
 visited = [False] * N
 out = []
-all_out = []
 
 def solve(depth, N, M):
     if depth == M:
-        tmp = ' '.join(map(str, out))
-        if tmp not in all_out:
-            all_out.append(tmp)
+        print(' '.join(map(str, out)))
         return
+    overlap = 0
     for i in range(N):
-        if not visited[i]:
-            out.append(L[i])
+        if not visited[i] and overlap != L[i]:
             visited[i] = True
+            out.append(L[i])
+            overlap = L[i]
             solve(depth+1, N, M)
-            out.pop()
             visited[i] = False
+            out.pop()
 
 solve(0, N, M)
-for i in all_out:
-    print(i)
