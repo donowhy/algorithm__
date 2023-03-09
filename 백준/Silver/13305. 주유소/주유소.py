@@ -1,27 +1,21 @@
-cities = int(input())
-distance = list(map(int,input().split()))
-price = list(map(int,input().split()))
+import sys
+input = sys.stdin.readline
 
-dist = []
-ga = []
-i = 0
-hap = 0
-while i < cities -1:
-    if price[i] <= price[i+1]:
-        dist.append(distance[i])
-        ga.append(price[i])
+N = int(input())
 
-    elif price[i] > price[i+1]:
-        if dist and ga:
-            dist.append(distance[i])
-            hap += sum(dist) * ga[0]
-            dist = []
-            ga = []
-        else:
-            hap += distance[i] * price[i]
+roads = list(map(int,input().split()))
+costs = list(map(int,input().split()))
 
-    i += 1
+# 첫번째 값 더하기
+min_price = roads[0] * costs[0]
 
-if dist and ga:
-    hap += sum(dist) * ga[0]
-print(hap)
+# 가장 값이 싼 주유소 지정
+min_cost = costs[0]
+
+for i in range(1, N-1):
+  if min_cost > costs[i]: # 가장 값이 싼 주유소가 현재 주유소 보다 비싸면 바꿔준다.
+    min_cost = costs[i] # 값 싼 주유소로 바꿔주기
+  
+  min_price += min_cost * roads[i]
+
+print(min_price)
