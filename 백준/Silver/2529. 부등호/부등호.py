@@ -1,70 +1,79 @@
-from itertools import permutations
+N  = int(input())
+bu = input().split()
 
-n = int(input())
-lst = list(input().split())
-
-arr = []
-
-for i in range(0,10):
-    arr.append(i)
-
-combi = list(permutations(arr,n+1))
-
-ans = []
-
-for i in combi:
-    if ans:
-        break
-    for j in range(n):
-
-        if j == n-1:
-            if lst[j] == '<':
-                if i[j] < i[j + 1]:
-                    ans.append(i)
-
-
-            elif lst[j] == '>':
-                if i[j] > i[j + 1]:
-                    ans.append(i)
-        else:
-            if lst[j] == '<':
-                if i[j] < i[j+1]:
-                    continue
-                else:
-                    break
-
-            elif lst[j] == '>':
-                if i[j] > i[j+1]:
-                    continue
-                else:
-                    break
-stk = []
-for i in range(len(combi)-1,0,-1):
-    if stk:
-        mx = list(stk[0])
-        mn = list(ans[0])
-
-        print(*mx, "\n", *mn, sep='')
-        exit()
-    for j in range(n):
-        if j == n-1:
-            if lst[j] == '<':
-                if combi[i][j] < combi[i][j + 1]:
-                    stk.append(combi[i])
+def recur_min(idx, minus, index):
+    global flag
+    if idx == N+1:
+        print(*stack, sep ='')
+        flag = True
+        return
+    if minus:
+        for i, num in enumerate(opt[:index]):
+            if visited[i]: continue
+            stack.append(num)
+            visited[i] = True
+            recur_min(idx+1, False if bu[idx%N] == '<' else True, i)
+            if flag: return
+            visited[i] = False
+            stack.pop()
+    else:
+        for i, num in enumerate(opt[index+1:], start = index+1):
+            if visited[i]: continue
+            visited[i] = True
+            stack.append(num)
+            recur_min(idx+1, False if bu[idx%N] == '<' else True, i)
+            if flag: return
+            stack.pop()
+            visited[i] = False
 
 
-            elif lst[j] == '>':
-                if combi[i][j] > combi[i][j + 1]:
-                    stk.append(combi[i])
-        else:
-            if lst[j] == '<':
-                if combi[i][j] < combi[i][j+1]:
-                    continue
-                else:
-                    break
+def recur_max(idx, minus, index):
+    global flag
+    if idx == N+1:
+        print(*stack, sep = '')
+        flag = True
+        return
+    if minus:
+        for i, num in enumerate(opt[:index]):
+            if visited[i]: continue
+            stack.append(num)
+            visited[i] = True
+            recur_max(idx+1, False if bu[idx%N] == '>' else True, i)
+            if flag: return
+            visited[i] = False
+            stack.pop()
+    else:
+        for i, num in enumerate(opt[index+1:], start = index+1):
+            if visited[i]: continue
+            visited[i] = True
+            stack.append(num)
+            recur_max(idx+1, False if bu[idx%N] == '>' else True, i)
+            if flag: return
+            stack.pop()
+            visited[i] = False
 
-            elif lst[j] == '>':
-                if combi[i][j] > combi[i][j+1]:
-                    continue
-                else:
-                    break
+
+opt = [i for i in range(9, 9-N-1, -1)]
+visited = [False] * (N+1)
+stack = []
+flag =False
+for i, num in enumerate(opt):
+    stack.append(num)
+    visited[i] = True
+    recur_max(1, False if bu[0] == '>' else True, i)
+    if flag: break
+    visited[i] = False
+    stack.pop()
+
+
+opt = [i for i in range(N+1)]
+visited = [False] * (N+1)
+stack = []
+flag = False
+for i, num in enumerate(opt):
+    stack.append(num)
+    visited[i] = True
+    recur_min(1, False if bu[0] == '<' else True, i)
+    if flag: break
+    visited[i] = False
+    stack.pop()
