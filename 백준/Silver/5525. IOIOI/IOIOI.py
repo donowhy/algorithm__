@@ -1,5 +1,3 @@
-# 5525 IOIOI
-
 N = int(input())
 M = int(input())
 
@@ -8,8 +6,8 @@ stk = []
 cnt = 0
 a = 'I' + 'OI' * N
 for i in range(len(arr) - (N*2)):
-    if arr[i] == 'O':
+    if arr[i] == 'O' and arr[i+(N*2)] == 'O' and arr[i+(N*2-1)] != 'O':
         continue
-    if ''.join(arr[i:i+(N*2+1)]) == a:
+    elif ''.join(arr[i:i+(N*2+1)]) == a:
         cnt += 1
 print(cnt)
