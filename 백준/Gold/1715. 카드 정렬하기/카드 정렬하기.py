@@ -1,18 +1,18 @@
-from heapq import *
-import sys
+import heapq as hq
 
-pq = []
-for _ in range(int(sys.stdin.readline().rstrip())):
-    x = int(sys.stdin.readline().rstrip())
-    heappush(pq, x)
-hap = 0
-while True:
-    if len(pq) >= 2:
-        a = heappop(pq)
-        b = heappop(pq)
-        hap += (a + b)
-        heappush(pq, a + b)
+N = int(input())
 
-    if len(pq) == 1:
-        print(hap)
-        break
+ca = []
+for _ in range(N):
+    hq.heappush(ca, int(input()))
+
+tmp = 0
+
+while len(ca) > 1:
+    a = hq.heappop(ca)
+    b = hq.heappop(ca)
+    tmp += (a+b)
+    hq.heappush(ca, (a+b))
+
+
+print(tmp)
