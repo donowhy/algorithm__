@@ -1,39 +1,38 @@
-num = int(input())
 
-bool = [True] * (num + 1)
-bool[0] = False
-bool[1] = False
-
-arr = []
-
-for i in range(2, int(num ** 0.5) + 1):
-    if bool[i]:
-        bool[i * 2::i] = [False] * ((num - i) // i)
-
-# 소수 배열 생성
-for i in range(num + 1):
-    if bool[i] == True:
-        arr.append(i)
+N = int(input())
 
 
-start = end = cnt = hap = 0
+isprime = [False] * 2 + [True] * (N - 1)
+
+for i in range(2, int(N ** 0.5) + 1):
+    if isprime[i] == True:
+        for j in range(i + i, N + 1, i):
+            isprime[j] = False
+
+prime = []
+
+for i in range(N + 1):
+    if isprime[i] == True:
+        prime.append(i)
+        
+res = 0
+start = 0
+end = 0
+tmp = 0
 
 while True:
+    if tmp == N:
+        res += 1
 
-    if hap == num:
-        cnt += 1
-
-    if hap > num:
-        hap -= arr[start]
+    if tmp > N:
+        tmp -= prime[start]
         start += 1
 
-    elif end == len(arr):
+    elif end == len(prime):
         break
 
-    elif hap <= num:
-        hap += arr[end]
+    else:
+        tmp += prime[end]
         end += 1
 
-
-
-print(cnt)
+print(res)
