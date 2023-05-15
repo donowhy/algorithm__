@@ -1,19 +1,17 @@
 import sys
+input = sys.stdin.readline
 
-n = int(sys.stdin.readline())
-tower = list(map(int, sys.stdin.readline().split()))
+N = int(input())
+heights = list(map(int, input().split()))
+
 stack = []
-goto = [0] * n
+res = [0] * N
 
-for i in range(n):
-    t = tower[i]
-    while stack and tower[stack[-1]] < t:
+for i in range(N):
+    while stack and heights[stack[-1]] < heights[i]:
         stack.pop()
-        # print(stack,'stack pop')
     if stack:
-        goto[i] = stack[-1] + 1
-        # print(goto, 'goto')
+        res[i] = stack[-1] + 1
     stack.append(i)
-    # print(stack, 'stack append')
 
-print(*goto)
+print(*res)
