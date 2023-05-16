@@ -1,35 +1,37 @@
-import sys
+
 from collections import deque
 
-t = int(input())
+tc = int(input())
 
-for i in range(t):
-    p = sys.stdin.readline().rstrip()
-    n = int(input())
-    arr = sys.stdin.readline().rstrip()[1:-1].split(",")
-    queue = deque(arr)
-    
-    rev = 0
-    flag = 0
-    if n == 0:
-        queue = []
+for _ in range(tc):
+    commands = list(input())
+    num = int(input())
+    nums = input()[1:-1]
 
-    for j in p:
-        if j == 'R':
-            rev += 1
-        elif j == 'D':
-            if len(queue) < 1:
-                flag = 1
+    if nums == '':
+        arr = deque()
+    else:
+        arr = deque(map(int,nums.split(",")))
+
+    doReverse = False
+    flag = 1
+
+    for command in commands:
+
+        if command == "R":
+            doReverse = not doReverse
+
+        if command == "D":
+            if arr:
+                if doReverse == False:
+                    arr.popleft()
+                else:
+                    arr.pop()
+            else:
+                flag = 0
                 print("error")
                 break
-            else:
-                if rev % 2 == 0:
-                    queue.popleft()
-                else:
-                    queue.pop()
-    if flag == 0:
-        if rev % 2 == 0:
-            print("[" + ",".join(queue) + "]")
-        else:
-            queue.reverse()
-            print("[" + ",".join(queue) + "]")
+    if doReverse:
+        arr.reverse()
+    if flag:
+        print(str(list(arr)).replace(' ', ''))
