@@ -1,45 +1,47 @@
-import sys
+#불!
 from collections import deque
+import sys
 input = sys.stdin.readline
 
-n, m = map(int, input().split())
-graph = []
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
 
-for i in range(n):
-    graph.append(list(input().rstrip()))
-    if 'J' in graph[i]:
-        q = deque([(0, i, graph[i].index('J'))])
+def bfs():
+    while fire:
+        x, y = fire.popleft()
+        for i in range(4):
+            nx, ny = x + dx[i], y + dy[i]
+            if 0 <= nx < w and 0 <= ny < h and building[nx][ny] != '#' and fire_spread[nx][ny] == -1:
+                fire_spread[nx][ny] = fire_spread[x][y] + 1
+                fire.append((nx, ny))
 
-for i in range(n):
-    for j in range(m):
-        if graph[i][j] == 'F':
-            q.append((-1, i, j))
+    while move:
+        x, y = move.popleft()
+        for i in range(4):
+            nx, ny = x + dx[i], y + dy[i]
+            if nx < 0 or nx >= w or ny < 0 or ny >= h:
+                return move_time[x][y] + 1
+            if 0 <= nx < w and 0 <= ny < h:
+                if building[nx][ny] != '#' and move_time[nx][ny] == -1 and (fire_spread[nx][ny] == -1 or fire_spread[nx][ny] > move_time[x][y] + 1):
+                    move_time[nx][ny] = move_time[x][y] + 1
+                    move.append((nx, ny))
+    return "IMPOSSIBLE"
 
-dx = [-1, 1, 0, 0]
-dy = [0, 0, -1, 1]
-ans = 'IMPOSSIBLE'
 
-while q:
-    time, x, y = q.popleft()
+w, h = map(int, input().split())
+building = [list(input().strip()) for _ in range(w)]
+fire_spread = [[-1]*h for _ in range(w)]
+move_time = [[-1]*h for _ in range(w)]
+fire = deque()
+move = deque()
 
-    # 지훈이 탈출
-    if time > -1 and graph[x][y] != 'F' and (x == 0 or y == 0 or x == n - 1 or y == m - 1):
-        ans = time + 1
-        break
+for i in range(w):
+    for j in range(h):
+        if building[i][j] == 'F':
+            fire.append((i, j))
+            fire_spread[i][j] = 0
+        elif building[i][j] == 'J':
+            move.append((i, j))
+            move_time[i][j] = 0
 
-    for i in range(4):
-        nx = x + dx[i]
-        ny = y + dy[i]
-        if 0 <= nx < n and 0 <= ny < m and graph[nx][ny] != '#':
-
-            # 지훈이 이동
-            if time > -1 and graph[nx][ny] == '.':
-                graph[nx][ny] = '_'
-                q.append((time + 1, nx, ny))
-
-            # 불 퍼뜨리기
-            elif time == -1 and graph[nx][ny] != 'F':
-                graph[nx][ny] = 'F'
-                q.append((-1, nx, ny))
-
-print(ans)
+print(bfs())
