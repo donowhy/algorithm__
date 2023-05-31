@@ -4,11 +4,11 @@
 
 ### 성능 요약
 
-메모리: 31256 KB, 시간: 40 ms
+메모리: 16340 KB, 시간: 156 ms
 
 ### 분류
 
-자료 구조(data_structures), 스택(stack)
+자료 구조, 스택
 
 ### 문제 설명
 
@@ -22,7 +22,7 @@
 
 <p>다른 예를 들어 그림으로 표현하면 <code>A+B*C-D/E</code>를 완전하게 괄호로 묶고 연산자를 이동시킬 장소를 표시하면 다음과 같이 된다.</p>
 
-<p style="text-align: center;"><img alt="" src="https://upload.acmicpc.net/5aad2feb-d9fc-430a-954d-73a06ba0215f/-/preview/" style="width: 166px; height: 50px;"></p>
+<p style="text-align: center;"><img alt="" src="" style="width: 166px; height: 50px;"></p>
 
 <p style="text-align: center;">결과: <code>ABC*+DE/-</code></p>
 
