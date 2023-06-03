@@ -1,25 +1,18 @@
-import sys
-input = sys.stdin.readline
-def dfs(len, idx):
-    if len == l:
-        vo = 0
-        co = 0
-        for i in range(l):
-            if arr[i] in 'aeiou': vo += 1
-            else: co += 1
-        if vo >= 1 and co >= 2:
-            print(''.join(arr))
-        return
-    for i in range(idx, c):
-        if check[i] == 0:
-            arr.append(s[i])
-            check[i] = 1
-            dfs(len + 1, i + 1)
-            check[i] = 0
-            del arr[-1]
-l, c = map(int, input().split())
-check = [0 for i in range(c)]
-arr = []
-s = input().split()
-s.sort()
-dfs(0, 0)
+def dfs(idx, arr, letter):
+    if len(letter) == L:
+        cnt = [l for l in letter if l in ja]
+        if len(cnt) >= 1 and len(letter)-len(cnt) >= 2:
+            arr.append(letter)
+            return
+
+    for i in range(idx, C):
+        dfs(i+1, arr, letter+lst[i])
+
+L, C = map(int,input().split())
+lst = sorted(list(input().split(" ")))
+ja = ["a", "e", "i", "o", "u"]
+
+bin = []
+dfs(0, bin, "")
+
+print('\n'.join(bin))
