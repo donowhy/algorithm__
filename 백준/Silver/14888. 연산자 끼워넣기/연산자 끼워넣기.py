@@ -1,19 +1,33 @@
-def dfs(n, num, add, sub, mul, div):
-    global mn, mx
-    if n == N:
-        mn = min(mn, num)
-        mx = max(mx, num)
+def dfs(hap, idx):
+    global mx, mn
 
-    if add: dfs(n + 1, num + arr[n], add - 1, sub, mul, div)
-    if sub: dfs(n + 1, num - arr[n], add, sub - 1, mul, div)
-    if mul: dfs(n + 1, num * arr[n], add, sub, mul - 1, div)
-    if div: dfs(n + 1, int(num / arr[n]), add, sub, mul, div - 1)
+    if idx == n:
+        mx = max(mx, hap)
+        mn = min(mn, hap)
+        return
 
-N = int(input())
-arr =  list(map(int, input().split()))
-add, sub, mul, div = map(int, input().split())  # (+, -, *, //)
+    for i in range(4):
+        if lst2[i] > 0:
+            lst2[i] -= 1
+            if i == 0:  # addition
+                dfs(hap + lst1[idx], idx + 1)
+            elif i == 1:  # subtraction
+                dfs(hap - lst1[idx], idx + 1)
+            elif i == 2:  # multiplication
+                dfs(hap * lst1[idx], idx + 1)
+            else:  # division
+                if hap < 0:
+                    dfs(-(-hap // lst1[idx]), idx + 1)  # handling negative numbers
+                else:
+                    dfs(hap // lst1[idx], idx + 1)
+            lst2[i] += 1
 
-mn = 10 ** 8
-mx = - 10 ** 8
-dfs(1, arr[0], add, sub, mul, div)
-print(f'{mx} \n{mn}')
+
+n = int(input())
+lst1 = list(map(int,input().split()))
+lst2 = list(map(int,input().split()))
+mx = -10 ** 9
+mn = 10 ** 9
+dfs(lst1[0], 1)
+print(mx)
+print(mn)
