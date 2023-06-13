@@ -1,31 +1,44 @@
-N = int(input())
-pos, neg, one = [], [], []
-result = 0
+n = int(input())
 
-for _ in range(N):
-    num = int(input())
-    if num > 1:
-        pos.append(num)
-    elif num <= 0:
-        neg.append(num)
+minus = []
+plus = []
+hap = 0
+
+for _ in range(n):
+    tmp = int(input())
+    if tmp <= 0:
+        minus.append(tmp)
+    elif tmp == 1:
+        hap += 1
     else:
-        one.append(num)
+        plus.append(tmp)
 
-pos.sort(reverse=True)
-neg.sort()
 
-# 양수 묶기
-for i in range(0, len(pos) - 1, 2):
-    result += pos[i] * pos[i + 1]
-if len(pos) % 2 == 1:  
-    result += pos[-1]
+plus.sort(reverse=True)
+minus.sort()
 
-# 음수 묶기
-for i in range(0, len(neg) - 1, 2):
-    result += neg[i] * neg[i + 1]
-if len(neg) % 2 == 1:  
-    result += neg[-1]
+stk = []
 
-result += len(one)
+for i in range(len(minus)):
+    stk.append(minus[i])
 
-print(result)
+    if len(stk) == 2:
+        hap += (stk[0] * stk[1])
+
+        stk.clear()
+
+if len(stk) == 1:
+    tmp = stk.pop()
+    hap += tmp
+
+for i in range(len(plus)):
+    stk.append(plus[i])
+
+    if len(stk) == 2:
+        hap += (stk[0] * stk[1])
+        stk.clear()
+
+if len(stk) == 1:
+    hap += stk[0]
+
+print(hap)
