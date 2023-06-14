@@ -1,68 +1,72 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int N, M, K;
-    static char[][] map;
-    static int[] dx = { -1, 1, 0, 0, -1, -1, 1, 1 };
-    static int[] dy = { 0, 0, -1, 1, -1, 1, -1, 1 };
-    static TrieNode root = new TrieNode();
 
-    static class TrieNode {
-        HashMap<Character, TrieNode> children = new HashMap<>();
-        int count = 0;
-    }
+    private static final int[] DX = {-1, 1, 0, 0, -1, -1, 1, 1};  // Directions for row (Up, Down, Left, Right, Diagonal)
+    private static final int[] DY = {0, 0, -1, 1, -1, 1, -1, 1};  // Directions for column (Up, Down, Left, Right, Diagonal)
 
-    static void insert(String word) {
-        TrieNode node = root;
-        for (char c : word.toCharArray()) {
-            node = node.children.computeIfAbsent(c, k -> new TrieNode());
-        }
-        node.count++;
-    }
+    private static char[][] map;
+    private static int N, M, K;
+    private static Map<String, Integer> godStrings = new HashMap<>();
+    private static String[] inputList;
 
-    static int search(String word) {
-        TrieNode node = root;
-        for (char c : word.toCharArray()) {
-            node = node.children.get(c);
-            if (node == null) return 0;
-        }
-        return node.count;
-    }
-
-    static void dfs(int x, int y, String word) {
-        if (word.length() == 5) {
-            insert(word);
-            return;
-        }
-
-        for (int dir = 0; dir < 8; dir++) {
-            int nx = (x + dx[dir] + N) % N;
-            int ny = (y + dy[dir] + M) % M;
-            dfs(nx, ny, word + map[nx][ny]);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] nmk = br.readLine().split(" ");
-        N = Integer.parseInt(nmk[0]);
-        M = Integer.parseInt(nmk[1]);
-        K = Integer.parseInt(nmk[2]);
-        map = new char[N][M];
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder result = new StringBuilder();  
+        StringTokenizer tokenizer = new StringTokenizer(reader.readLine(), " ");
         
-        for (int i = 0; i < N; i++) {
-            map[i] = br.readLine().toCharArray();
+        N = Integer.parseInt(tokenizer.nextToken());
+        M = Integer.parseInt(tokenizer.nextToken());
+        K = Integer.parseInt(tokenizer.nextToken());
+        
+        map = new char[N + 1][M + 1];
+        inputList = new String[K + 1];
+        
+        for (int i = 1; i <= N; i++) {
+            String input = reader.readLine();
+            for (int j = 1; j <= M; j++) {
+                map[i][j] = input.charAt(j - 1);
+            }
         }
 
-        for (int i = 0; i < N; i++)
-            for (int j = 0; j < M; j++)
-                dfs(i, j, String.valueOf(map[i][j]));
+        // Save god's favorite strings into the map
+        for (int i = 1; i <= K; i++) {       
+            String input = reader.readLine();
+            inputList[i] = input;
+            godStrings.put(input, 0);
+        }
 
-        for (int k = 0; k < K; k++) {
-            String word = br.readLine();
-            System.out.println(search(word));
+        // Apply DFS for all points in the map
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= M; j++) {
+                DFS(i, j, 1, String.valueOf(map[i][j])); 
+            }
+        }
+
+        // Print the result
+        for (int i = 1; i <= K; i++) {
+            result.append(godStrings.get(inputList[i])).append("\n");
+        }  
+        
+        System.out.println(result.toString());
+    }
+
+    private static void DFS(int row, int col, int count, String s) {  
+        if (godStrings.containsKey(s)) {
+            godStrings.put(s, godStrings.get(s) + 1);
+        }  
+
+        if (count < 5) {
+            for (int i = 0; i <= 7; i++) {
+                int newRow = (row + DX[i] + N) % N + 1;  // Apply circular (ring) logic
+                int newCol = (col + DY[i] + M) % M + 1;
+                DFS(newRow, newCol, count + 1, s + map[newRow][newCol]); 
+            }
         }
     }
 }
