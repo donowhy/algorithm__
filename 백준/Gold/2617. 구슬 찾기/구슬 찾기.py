@@ -1,27 +1,32 @@
 import sys
-input = sys.stdin.readline
+sys.setrecursionlimit(10**6)
+
+def dfs(start, graph, visited):
+    stack = [start]
+    count = 0
+    while stack:
+        current = stack.pop()
+        for nxt in graph[current]:
+            if not visited[nxt]:
+                visited[nxt] = True
+                stack.append(nxt)
+                count += 1
+    return count
 
 n, m = map(int, input().split())
-INF = int(1e9)
-heavy = [[INF] * n for _ in range(n)]
-light = [[INF] * n for _ in range(n)]
+mid = (n // 2) + 1
+light = [[] for _ in range(n+1)]
+heavy = [[] for _ in range(n+1)]
 
 for _ in range(m):
     a, b = map(int, input().split())
-    heavy[b - 1][a - 1] = 1  # b가 a보다 무겁다
-    light[a - 1][b - 1] = 1  # a가 b보다 가볍다
+    light[b].append(a)
+    heavy[a].append(b)
 
-for k in range(n):
-    for i in range(n):
-        for j in range(n):
-            heavy[i][j] = min(heavy[i][j], heavy[i][k] + heavy[k][j])
-            light[i][j] = min(light[i][j], light[i][k] + light[k][j])
+result = 0
 
-cnt = 0
-for i in range(n):
-    heavy_cnt = len([1 for j in range(n) if heavy[i][j] != INF])
-    light_cnt = len([1 for j in range(n) if light[i][j] != INF])
-    if heavy_cnt > n // 2 or light_cnt > n // 2:
-        cnt += 1
+for i in range(1, n+1):
+    if dfs(i, light, [False] * (n+1)) >= mid or dfs(i, heavy, [False] * (n+1)) >= mid:
+        result += 1
 
-print(cnt)
+print(result)
