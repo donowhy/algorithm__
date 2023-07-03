@@ -1,85 +1,116 @@
+
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.*;
+import java.io.InputStreamReader;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 public class Main {
-    static class Point {
-        int x, y, z;
-        Point(int x, int y, int z) {
+
+    static int L, R, C;
+    static String[][][] map;
+    static int[][][] visited;
+    static int[] dx = {1, 0, -1, 0, 0, 0};
+    static int[] dy = {0, 1, 0, -1, 0, 0};
+    static int[] dz = {0, 0, 0, 0, 1, -1};
+    static Deque<Point> S = new LinkedList<>();
+
+    static class Point{
+        int z;
+        int x;
+        int y;
+
+        public Point(int z, int x, int y) {
+            this.z = z;
             this.x = x;
             this.y = y;
-            this.z = z;
         }
     }
 
-    static int L, R, C;
-    static char[][][] map;
-    static boolean[][][] visited;
-    static int[] dx = { -1, 1, 0, 0, 0, 0 };
-    static int[] dy = { 0, 0, -1, 1, 0, 0 };
-    static int[] dz = { 0, 0, 0, 0, -1, 1 };
-    static Point start, end;
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        while(true) {
 
-        while (true) {
             StringTokenizer st = new StringTokenizer(br.readLine());
+
             L = Integer.parseInt(st.nextToken());
             R = Integer.parseInt(st.nextToken());
             C = Integer.parseInt(st.nextToken());
 
-            if (L == 0 && R == 0 && C == 0) break;
+            if(L == 0 && R == 0 && C == 0){
+                break;
+            }
 
-            map = new char[L][R][C];
-            visited = new boolean[L][R][C];
+            map = new String[L][R][C];
+            visited = new int[L][R][C];
+
 
             for (int i = 0; i < L; i++) {
                 for (int j = 0; j < R; j++) {
-                    String str = br.readLine();
+                    String line = br.readLine();
                     for (int k = 0; k < C; k++) {
-                        map[i][j][k] = str.charAt(k);
-                        if (map[i][j][k] == 'S') start = new Point(i, j, k);
-                        if (map[i][j][k] == 'E') end = new Point(i, j, k);
+                        map[i][j][k] = Character.toString(line.charAt(k));
+                        if (map[i][j][k].equals("S")) {
+                            S.add(new Point(i, j, k));
+                            visited[i][j][k] = 1;
+                        }
                     }
                 }
-                br.readLine();
+                String trap = br.readLine();
             }
 
-            int result = bfs();
 
-            System.out.println(result == -1 ? "Trapped!" : "Escaped in " + result + " minute(s).");
+//        for(int i=0; i<L; i++){
+//            for(int j=0; j<R; j++){
+//                for(int k=0; k<C; k++){
+//                    System.out.print(map[i][j][k]);
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();;
+//        }
+
+            int res = bfs();
+
+            if (res == 0) {
+                System.out.println("Trapped!");
+            } else {
+                System.out.println("Escaped in " + res + " minute(s).");
+            }
         }
+
     }
 
-    static int bfs() {
-        Queue<Point> queue = new LinkedList<>();
-        visited[start.x][start.y][start.z] = true;
-        queue.add(start);
-        int count = 0;
+    static int bfs(){
+        Deque<Point> dq = new LinkedList<>();
+        dq.add(S.poll());
 
-        while (!queue.isEmpty()) {
-            int size = queue.size();
+        while(!dq.isEmpty()){
+            Point p = dq.poll();
 
-            while (size-- > 0) {
-                Point p = queue.poll();
-                if (p.x == end.x && p.y == end.y && p.z == end.z) return count;
+            for (int i=0; i<6; i++){
+                int nz = p.z + dz[i];
+                int nx = p.x + dx[i];
+                int ny = p.y + dy[i];
 
-                for (int i = 0; i < 6; i++) {
-                    int nx = p.x + dx[i];
-                    int ny = p.y + dy[i];
-                    int nz = p.z + dz[i];
-
-                    if (nx < 0 || ny < 0 || nz < 0 || nx >= L || ny >= R || nz >= C) continue;
-                    if (visited[nx][ny][nz] || map[nx][ny][nz] == '#') continue;
-
-                    visited[nx][ny][nz] = true;
-                    queue.add(new Point(nx, ny, nz));
+                if(valid(nz, nx, ny)){
+                    if(map[nz][nx][ny].equals("E")){
+                        return visited[p.z][p.x][p.y];
+                    }
+                    visited[nz][nx][ny] = visited[p.z][p.x][p.y] + 1;
+                    dq.add(new Point(nz, nx, ny));
                 }
             }
-            count++;
         }
-        return -1;
+        return 0;
     }
+
+    static boolean valid(int nz, int nx, int ny){
+        if(0 <= nx && nx < R && 0 <= nz && nz < L && 0 <= ny && ny < C && !map[nz][nx][ny].equals("#") && visited[nz][nx][ny] == 0){
+            return true;
+        }
+        return false;
+    }
+
 }
