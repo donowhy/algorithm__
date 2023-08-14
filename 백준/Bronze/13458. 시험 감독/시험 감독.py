@@ -1,16 +1,16 @@
-import sys
+# Input
+n = int(input())  # Number of test sites
+a = list(map(int, input().split()))  # List of examinees at each test site
+b, c = map(int, input().split())  # Main and sub proctor's capacity
 
-n = int(sys.stdin.readline().rstrip())
-people = list(map(int,sys.stdin.readline().rstrip().split()))
-b, c = map(int,sys.stdin.readline().rstrip().split())
-
-cnt = n
-
-for i in people:
+# Main Logic
+result = n  # Since each test site needs at least one main proctor
+for i in a:
     i -= b
     if i > 0:
-        cnt += i // c
+        result += (i // c)
         if i % c:
-            cnt += 1
+            result += 1
 
-print(cnt)
+# Print the result
+print(result)
