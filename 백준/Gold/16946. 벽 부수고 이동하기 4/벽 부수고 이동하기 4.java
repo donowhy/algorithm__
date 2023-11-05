@@ -1,89 +1,136 @@
 import java.io.*;
 import java.util.*;
 
+class Point
+{
+    int x,y;
+    
+    public Point(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+}
 public class Main {
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
-    static int[][] grid, group, ans;
-    static int[] groupSize;
-    static int n, m, groupNo = 1;
-
+    static int N,M;
+    static int [][] map;
+    static int [][] group;
+    static List<Integer> groupArea;
+    static boolean [][] visited;
+    static Queue<Point> blank;
+    static Queue<Point> wall;
+    static int [] dx = {-1,1,0,0};
+    static int [] dy = {0,0,-1,1};
+    static int groupSize;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] input = br.readLine().split(" ");
-        n = Integer.parseInt(input[0]);
-        m = Integer.parseInt(input[1]);
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
 
-        grid = new int[n][m];
-        group = new int[n][m];
-        ans = new int[n][m];
-        groupSize = new int[n * m + 1];
+        map = new int[N][M];
+        group = new int[N][M];
+        groupArea = new ArrayList<>();
 
-        for (int i = 0; i < n; i++) {
-            String row = br.readLine();
-            for (int j = 0; j < m; j++) {
-                grid[i][j] = row.charAt(j) - '0';
+        blank = new LinkedList<>();
+        wall = new LinkedList<>();
+
+        for (int i = 0; i < N; ++i) {
+            String tmp = br.readLine();
+
+            for (int j = 0; j < M; ++j) {
+                int next = tmp.charAt(j) - '0';
+                map[i][j] = next;
+                if (next < 1) blank.add(new Point(i, j));
+                else wall.add(new Point(i, j));
             }
         }
 
-        // calculate size for each group
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (grid[i][j] == 0 && group[i][j] == 0) {
-                    groupSize[groupNo] = dfs(i, j, groupNo);
-                    groupNo++;
-                }
-            }
+        int groupNum = 0;
+        visited = new boolean[N][M];
+
+        // 빈칸 그룹화
+        while (!blank.isEmpty()) {
+            Point cur = blank.poll();
+            if (visited[cur.x][cur.y]) continue;
+            visited[cur.x][cur.y] = true;
+            makeGroup(cur.x, cur.y, groupNum);
+            groupNum++;
+        }
+        groupSize = groupArea.size();
+
+        int [][] answer = new int[N][M];
+        //벽 부수고 해당 인접한 그룹들의 값 더하기
+        while (!wall.isEmpty()) {
+            Point cur = wall.poll();
+            answer[cur.x][cur.y] = getTotal(cur.x, cur.y) % 10;
         }
 
-        // calculate the answer
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (grid[i][j] == 1) {
-                    ans[i][j] = getAnswer(i, j) % 10;
-                }
-            }
-        }
-
-        // print the answer
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                sb.append(ans[i][j]);
-            }
-            sb.append('\n');
+        for(int [] i : answer)
+        {
+            for(int j : i) sb.append(j);
+            sb.append("\n");
         }
-        System.out.println(sb);
+        System.out.print(sb);
     }
 
-    static int dfs(int x, int y, int no) {
-        int cnt = 1;
-        group[x][y] = no;
+    static void makeGroup(int i, int j,int groupNum)
+    {
+        Queue<Point> tmpQ = new LinkedList<>();
+        tmpQ.add(new Point(i,j));
+        int cnt = 0;
+        while(!tmpQ.isEmpty())
+        {
+            Point cur = tmpQ.poll();
 
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-            if (nx >= 0 && nx < n && ny >= 0 && ny < m && grid[nx][ny] == 0 && group[nx][ny] == 0) {
-                cnt += dfs(nx, ny, no);
+            group[cur.x][cur.y] = groupNum;
+            cnt++;
+
+            for(int idx = 0; idx < 4; ++idx)
+            {
+                int mx = cur.x + dx[idx];
+                int my = cur.y + dy[idx];
+
+                if(!isValid(mx,my) || visited[mx][my] || map[mx][my] > 0) continue;
+
+                visited[mx][my] = true;
+                tmpQ.add(new Point(mx,my));
             }
         }
-        return cnt;
+        groupArea.add(cnt);
     }
 
-    static int getAnswer(int x, int y) {
-        Set<Integer> adjacentGroups = new HashSet<>();
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-            if (nx >= 0 && nx < n && ny >= 0 && ny < m && grid[nx][ny] == 0) {
-                adjacentGroups.add(group[nx][ny]);
+
+    static int getTotal(int i, int j)
+    {
+        Queue<Point> tmpQ = new LinkedList<>();
+        tmpQ.add(new Point(i,j));
+        int total = 1;
+
+        boolean [] visitedGroup = new boolean[groupSize];
+        while(!tmpQ.isEmpty())
+        {
+            Point cur = tmpQ.poll();
+
+            for(int idx = 0; idx < 4; ++idx)
+            {
+                int mx = cur.x + dx[idx];
+                int my = cur.y + dy[idx];
+
+                if(!isValid(mx,my) || map[mx][my] > 0) continue;
+
+                //방문하지 않았던 그룹이면 토탈에 더해줌.
+                int groupNum = group[mx][my];
+                if(visitedGroup[groupNum]) continue;
+                total += groupArea.get(groupNum);
+                visitedGroup[groupNum] = true;
             }
         }
-
-        int ans = 1;
-        for (int g : adjacentGroups) {
-            ans += groupSize[g];
-        }
-        return ans;
+        return total;
+    }
+    static boolean isValid(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < N && y < M;
     }
 }
