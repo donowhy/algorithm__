@@ -1,87 +1,95 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.PriorityQueue;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
+class Edge implements Comparable<Edge> {
+	int start;
+	int end;
+	int weight;
+
+	Edge(int start, int end, int weight) {
+		this.start = start;
+		this.end = end;
+		this.weight = weight;
+	}
+
+	@Override
+	public int compareTo(Edge o) {
+		return weight - o.weight;
+	}
+
+}
+
 public class Main {
-    static StringTokenizer st;
-    static int v;
-    static int e;
-    static int[] parent;
-    static PriorityQueue<Edge> q;
-    static class Edge implements Comparable<Edge> {
-        int v1;
-        int v2;
-        int cost;
+	static int[] parent;
+	static ArrayList<Edge> edgeList;
 
-        public Edge(int a, int b, int c){
-            this.v1 = a;
-            this.v2 = b;
-            this.cost = c;
-        }
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-        @Override
-        public int compareTo(Edge o) {
-            return cost - o.cost;
-        }
-    }
+		int N = Integer.parseInt(st.nextToken());
+		int M = Integer.parseInt(st.nextToken());
 
-    public static void union(int n1, int n2){
-        int p1 = find(n1);
-        int p2 = find(n2);
-        if(p1 < p2) parent[p2] = p1;
-        else parent[p1] = p2;
-    }
+		edgeList = new ArrayList<>();
+		for (int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int start = Integer.parseInt(st.nextToken());
+			int end = Integer.parseInt(st.nextToken());
+			int weight = Integer.parseInt(st.nextToken());
 
-    public static int find(int n){
-        if (parent[n] == n) return n;
+			edgeList.add(new Edge(start, end, weight));
+		}
 
-        return parent[n] = find(parent[n]);
+		parent = new int[N + 1];
+		for (int i = 1; i <= N; i++) {
+			parent[i] = i;
+		}
 
-    }
+		Collections.sort(edgeList);
+		
+		// 모든 집이 N - 1개의 길로 연결되도록 만듦.
+		int ans = 0;
+		int bigCost = 0;
+		for (int i = 0; i < edgeList.size(); i++) {
+			Edge edge = edgeList.get(i);
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        st = new StringTokenizer(br.readLine());
+			// 사이클이 발생하는 간선은 제외.
+			if (find(edge.start) != find(edge.end)) {
+				ans += edge.weight;
+				union(edge.start, edge.end);
+				
+				bigCost = edge.weight;
+			}
+		}
 
-        v = Integer.parseInt(st.nextToken());
-        e = Integer.parseInt(st.nextToken());
+		bw.write((ans - bigCost) + "\n");
+		bw.flush();
+		bw.close();
+		br.close();
+	}
 
-        q = new PriorityQueue<>();
-        parent = new int[v+1];
+	public static int find(int x) {
+		if (x == parent[x]) {
+			return x;
+		}
 
-        for(int i=0; i<= v; i++){
-            parent[i] = i;
-        }
+		return parent[x] = find(parent[x]);
+	}
 
+	public static void union(int x, int y) {
+		x = find(x);
+		y = find(y);
 
-        for(int i=0; i<e; i++){
-            st = new StringTokenizer(br.readLine());
+		if (x != y) {
+			parent[y] = x;
+		}
+	}
 
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            q.offer(new Edge(a, b, c));
-        }
-
-        int cost = 0;
-        int maxEdgeCost = 0;
-
-        while (!q.isEmpty()){
-            Edge edge = q.poll();
-
-            if (find(edge.v1) != find(edge.v2)) {
-                union(edge.v1, edge.v2);
-                cost += edge.cost;
-                maxEdgeCost = Math.max(maxEdgeCost, edge.cost); 
-            }
-        }
-
-        cost -= maxEdgeCost;
-
-        System.out.println(cost);
-
-    }
 }
