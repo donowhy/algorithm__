@@ -1,14 +1,18 @@
-# [Gold IV] 게리맨더링 - 17471 
+# [Gold III] 게리맨더링 - 17471 
 
 [문제 링크](https://www.acmicpc.net/problem/17471) 
 
 ### 성능 요약
 
-메모리: 34208 KB, 시간: 68 ms
+메모리: 16772 KB, 시간: 136 ms
 
 ### 분류
 
 너비 우선 탐색, 브루트포스 알고리즘, 조합론, 깊이 우선 탐색, 그래프 이론, 그래프 탐색, 수학
+
+### 제출 일자
+
+2024년 9월 26일 14:56:42
 
 ### 문제 설명
 
@@ -26,9 +30,9 @@
 	<tbody>
 		<tr>
 			<td style="width: 25%; text-align: center;"><img alt="" src="https://upload.acmicpc.net/b82fcf21-6f4c-4797-bda6-215e14099d19/-/preview/" style="width: 220px; height: 195px;"></td>
-			<td style="width: 25%; text-align: center;"><img alt="" src="https://upload.acmicpc.net/32947e26-4ec4-4b20-99f1-106d8386683d/-/preview/" style="width: 220px; height: 195px;"></td>
+			<td style="width: 25%; text-align: center;"><img alt="" src="" style="width: 220px; height: 195px;"></td>
 			<td style="width: 25%; text-align: center;"><img alt="" src="https://upload.acmicpc.net/f5dd6143-c013-46d3-ba4c-dadc48bdf5bc/-/preview/" style="width: 220px; height: 195px;"></td>
-			<td style="width: 25%; text-align: center;"><img alt="" src="https://upload.acmicpc.net/548b1153-84de-4b85-9697-2561b019a02b/-/preview/" style="width: 220px; height: 195px;"></td>
+			<td style="width: 25%; text-align: center;"><img alt="" src="" style="width: 220px; height: 195px;"></td>
 		</tr>
 		<tr>
 			<td style="width: 25%; text-align: center;">
