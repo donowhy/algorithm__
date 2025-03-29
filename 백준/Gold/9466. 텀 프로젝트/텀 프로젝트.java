@@ -1,51 +1,56 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-    static int tc;
-    static int N, cnt;
-    static int[] arr;
+
+    static int[] tr;
     static boolean[] visited;
     static boolean[] finished;
+    static int count;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        tc = Integer.parseInt(br.readLine());
-        for (int i=0; i<tc; i++){
-            N = Integer.parseInt(br.readLine());
-            cnt = 0;
-            arr = new int[N+1];
-            visited = new boolean[N+1];
-            finished = new boolean[N+1];
-            StringTokenizer st = new StringTokenizer(br.readLine());
+        var br = new BufferedReader(new InputStreamReader(System.in));
+        int tc = Integer.parseInt(br.readLine());
 
-            for(int j=1; j<=N; j++){
-                arr[j] = Integer.parseInt(st.nextToken());
+        while (tc-- > 0) {
+            int n = Integer.parseInt(br.readLine());
+
+            tr = new int[n];
+            visited = new boolean[n];
+            finished = new boolean[n];
+            count = 0;
+
+            String[] input = br.readLine().split(" ");
+            for (int i = 0; i < n; i++) {
+                tr[i] = Integer.parseInt(input[i]) - 1;
             }
 
-            for(int j=1; j<=N; j++){
-                if(!visited[j]) dfs(j);
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    dfs(i);
+                }
             }
-            System.out.println(N-cnt);
 
+            System.out.println(n - count);
         }
     }
-    static void dfs(int now){
-        visited[now] = true;
-        int next = arr[now];
 
-        if (!visited[next]){
+    public static void dfs(int curr) {
+        visited[curr] = true;
+        int next = tr[curr];
+
+        if (!visited[next]) {
             dfs(next);
-        }else{
-            if (!finished[next]){
-                for(int i=next; i != now; i=arr[i]){
-                    cnt++;
-                }
-                cnt++;
+        } else if (!finished[next]) {
+            // 사이클 발견
+            for (int i = next; i != curr; i = tr[i]) {
+                count++;
             }
+            count++;
         }
-        finished[now] = true;
+
+        finished[curr] = true;
     }
 }
