@@ -1,97 +1,103 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class Main {
 
-    static final int INF = 200_000_000; // 최대 n-1개의 간선을 지나는데, 각 간선의 최대 가중치가 1,000,000이므로 충분히 큰 값으로 설정
-    static int n, e, v1, v2;
-    static ArrayList<ArrayList<Node>> graph;
-    static int[] dist;
-
-    static class Node implements Comparable<Node> {
-        int vertex, weight;
-
-        public Node(int vertex, int weight) {
-            this.vertex = vertex;
-            this.weight = weight;
+    private static int n, e, v1, v2;
+    private static class Node implements Comparable<Node>{
+        int e, c;
+        public Node(int e, int c) {
+            this.e = e;
+            this.c = c;
         }
 
         @Override
         public int compareTo(Node o) {
-            return this.weight - o.weight;
+            return this.c - o.c;
         }
     }
 
+    private static ArrayList<Node>[] nodeList;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        String[] s = br.readLine().split(" ");
 
-        n = Integer.parseInt(st.nextToken());
-        e = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(s[0]);
+        e = Integer.parseInt(s[1]);
 
-        graph = new ArrayList<>();
+        nodeList = new ArrayList[n+1];
 
-        for (int i = 0; i <= n; i++) {
-            graph.add(new ArrayList<>());
+        for(int i=0; i<=n; i++) {
+            nodeList[i] = new ArrayList<>();
         }
 
-        for (int i = 0; i < e; i++) {
-            st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
+        for(int i=0; i<e; i++) {
+            s = br.readLine().split(" ");
+            int x = Integer.parseInt(s[0]);
+            int y = Integer.parseInt(s[1]);
+            int coin = Integer.parseInt(s[2]);
 
-            graph.get(a).add(new Node(b, c));
-            graph.get(b).add(new Node(a, c));
+            nodeList[x].add(new Node(y, coin));
+            nodeList[y].add(new Node(x, coin));
         }
 
-        st = new StringTokenizer(br.readLine());
-        v1 = Integer.parseInt(st.nextToken());
-        v2 = Integer.parseInt(st.nextToken());
+        s = br.readLine().split(" ");
+        v1 = Integer.parseInt(s[0]);
+        v2 = Integer.parseInt(s[1]);
 
-        long answer = 0;
-        // 1 -> v1 -> v2 -> N
-        long route1 = dijkstra(1, v1) + dijkstra(v1, v2) + dijkstra(v2, n);
 
-        // 1 -> v2 -> v1 -> N
-        long route2 = dijkstra(1, v2) + dijkstra(v2, v1) + dijkstra(v1, n);
+        int a = dijkstra(1, v1);
+        int aa = dijkstra(1, v2);
 
-        // 두 경로 중 작은 값을 최단 경로로 한다. 단, 경로가 존재하지 않는 경우(INF 이상) -1을 출력한다.
-        if (route1 >= INF && route2 >= INF) {
-            answer = -1;
-        } else {
-            answer = Math.min(route1, route2);
+        int b = dijkstra(v1, v2);
+
+        int c = dijkstra(v1, n);
+        int cc = dijkstra(v2, n);
+
+        boolean flag = false;
+        boolean flag2 = false;
+
+        if(a == -1 || b == -1 || cc == -1) {
+            flag2 = true;
         }
 
-        System.out.println(answer);
-        br.close();
+        if(aa == -1 || b == -1 || c == -1) {
+            flag = true;
+        }
+
+        if(flag && flag2) {
+            System.out.println(-1);
+            return;
+        }
+
+        int result = Math.min(a + cc, c + aa) + b;
+
+        System.out.println(result);
     }
 
-    static long dijkstra(int start, int end) {
-        dist = new int[n + 1];
-        Arrays.fill(dist, INF);
+
+
+    private static int dijkstra(int s, int e) {
+        int[] dist = new int[n+1];
+        for(int i=0; i<=n; i++) {
+            dist[i] = Integer.MAX_VALUE;
+        }
+        dist[s] = 0;
         PriorityQueue<Node> pq = new PriorityQueue<>();
-        boolean[] visited = new boolean[n + 1];
+        pq.offer(new Node(s, 0));
 
-        pq.offer(new Node(start, 0));
-        dist[start] = 0;
-
-        while (!pq.isEmpty()) {
-            Node current = pq.poll();
-
-            if (visited[current.vertex]) continue;
-            visited[current.vertex] = true;
-
-            for (Node node : graph.get(current.vertex)) {
-                if (!visited[node.vertex] && dist[node.vertex] > dist[current.vertex] + node.weight) {
-                    dist[node.vertex] = dist[current.vertex] + node.weight;
-                    pq.offer(new Node(node.vertex, dist[node.vertex]));
-                }
+        while(!pq.isEmpty()) {
+            Node node = pq.poll();
+            if(node.e == e) return node.c;
+            for(Node next : nodeList[node.e]) {
+                if(dist[next.e] <= node.c + next.c) continue;
+                dist[next.e] = node.c + next.c;
+                pq.offer(new Node(next.e, dist[next.e]));
             }
         }
-
-        return dist[end];
+        return -1;
     }
 }
