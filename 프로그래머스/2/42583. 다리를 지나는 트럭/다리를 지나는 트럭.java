@@ -1,38 +1,61 @@
 import java.util.*;
 
 class Solution {
-    static class Truck {
-        int weight;
-        int entryTime; // the time at which the truck enters the bridge
-
-        public Truck(int weight, int entryTime) {
-            this.weight = weight;
-            this.entryTime = entryTime;
+    
+    public class Truck {
+        int w;
+        int endTime;
+        
+        public Truck (int w, int endTime) {
+            this.w = w;
+            this.endTime = endTime;
+        }
+        
+        public String toString() {
+            return "weigt => " + this.w + " endTime => " + this.endTime;
         }
     }
-
+    
     public int solution(int bridge_length, int weight, int[] truck_weights) {
-        Queue<Truck> bridge = new LinkedList<>();
-        int time = 0;
-        int currentWeightOnBridge = 0;
+        //정해진 순으로 
+        
+        ArrayDeque<Integer> list = new ArrayDeque<>();
+        for(int t : truck_weights) {
+            list.add(t);
+        }
+        
+        int tw = weight - list.peek();
+        int bl = bridge_length;
+        int tt = 1;
+        
+        ArrayDeque<Truck> cars = new ArrayDeque<>();
+        cars.offer(new Truck(list.poll(), bl + tt));
+        
+        System.out.println();
+        while(true) {
+            tt += 1;
 
-        int i = 0;
-        while (i < truck_weights.length || !bridge.isEmpty()) {
-            time++;
-
-            // Remove trucks that have crossed the bridge
-            if (!bridge.isEmpty() && time - bridge.peek().entryTime >= bridge_length) {
-                currentWeightOnBridge -= bridge.poll().weight;
+                        
+            if(cars.size() > 0) {
+                Truck car = cars.peek();
+                if(car.endTime == tt) {
+                    cars.poll();
+                    tw += car.w;
+                }
             }
-
-            // Add trucks to the bridge if possible
-            if (i < truck_weights.length && currentWeightOnBridge + truck_weights[i] <= weight) {
-                bridge.offer(new Truck(truck_weights[i], time));
-                currentWeightOnBridge += truck_weights[i];
-                i++;
+            
+            if(list.size() > 0){
+                int w = list.peekFirst();
+                if(tw - w >= 0) {
+                    list.pollFirst();
+                    cars.offer(new Truck(w, tt + bl));
+                    tw -= w;
+                }
+            }
+            
+            if(list.size() == 0 && cars.size() == 0) {
+                return tt;
             }
         }
-
-        return time;
     }
 }
