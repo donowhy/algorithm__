@@ -3,54 +3,56 @@ import java.util.*;
 class Solution {
 
     public int[] solution(String[] gems) {
-        int totalTypeCount = new HashSet<>(Arrays.asList(gems)).size();
+
+        Set<String> gemTypes = new HashSet<>(Arrays.asList(gems));
+        int requiredTypeCount = gemTypes.size();
 
         Map<String, Integer> countMap = new HashMap<>();
 
         int left = 0;
+        int right = 0;
 
-        int answerStart = 0;
-        int answerEnd = gems.length - 1;
-        int minLength = gems.length;
+        int bestStart = 0;
+        int bestEnd = gems.length - 1;
+        int minLength = Integer.MAX_VALUE;
 
-        for (int right = 0; right < gems.length; right++) {
+        while (right < gems.length) {
 
             // 오른쪽 보석 추가
-            String rightGem = gems[right];
             countMap.put(
-                rightGem,
-                countMap.getOrDefault(rightGem, 0) + 1
+                gems[right],
+                countMap.getOrDefault(gems[right], 0) + 1
             );
 
-            // 모든 종류의 보석을 포함하고 있다면
-            while (countMap.size() == totalTypeCount) {
+            right++;
 
-                int currentLength = right - left + 1;
+            // 모든 종류가 포함되었다면 왼쪽 축소
+            while (countMap.size() == requiredTypeCount) {
 
-                // 더 짧은 구간 발견
+                int currentLength = right - left;
+
                 if (currentLength < minLength) {
                     minLength = currentLength;
-                    answerStart = left;
-                    answerEnd = right;
+                    bestStart = left;
+                    bestEnd = right - 1;
                 }
 
-                // 왼쪽 보석 제거
                 String leftGem = gems[left];
-                countMap.put(leftGem, countMap.get(leftGem) - 1);
+                int count = countMap.get(leftGem);
 
-                // 개수가 0이면 Map에서 제거
-                if (countMap.get(leftGem) == 0) {
+                if (count == 1) {
                     countMap.remove(leftGem);
+                } else {
+                    countMap.put(leftGem, count - 1);
                 }
 
                 left++;
             }
         }
 
-        // 문제의 인덱스는 1부터 시작
         return new int[]{
-            answerStart + 1,
-            answerEnd + 1
+            bestStart + 1,
+            bestEnd + 1
         };
     }
 }
