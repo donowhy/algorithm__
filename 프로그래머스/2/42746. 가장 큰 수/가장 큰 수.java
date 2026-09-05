@@ -8,14 +8,9 @@ class Solution {
         for (int i = 0; i < numbers.length; i++) {
             strNumbers[i] = String.valueOf(numbers[i]);
         }
-
-        // 사용자 정의 Comparator를 사용해 정렬
-        Arrays.sort(strNumbers, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                // o1 + o2와 o2 + o1을 비교해 더 큰 순서대로 정렬
-                return (o2 + o1).compareTo(o1 + o2);
-            }
+        
+        Arrays.sort(strNumbers, (a, b) -> {
+            return (b + a).compareTo(a + b);
         });
 
         // 정렬된 결과를 하나의 문자열로 합침
