@@ -1,80 +1,63 @@
 import java.util.*;
 
 class Solution {
-    public class Count {
-        String s;
-        int t;
-        int dc;
-        public Count (String s, int t, int dc) {
-            this.s = s;
-            this.t = t;
-            this.dc = dc;
-        }
+    public class Node {
+        String word;
+        int cost;
         
-        public String toString() {
-            return s + " " + t + " " + dc;
+        public Node (String word, int cost) {
+            this.word = word;
+            this.cost = cost;
         }
     }
     public int solution(String begin, String target, String[] words) {
+        // bfs begin, words
+        // 모든 걸 확인하면서 words true false 진행
+        // cost가 가장 작은걸로
         
-        if (!Arrays.asList(words).contains(target)) {
-            return 0;
-        }
-        
-        int vt = bfs(begin, target, words);    
-        
-        return vt == 0 ? 0 : vt;
+        int answer = findWord(begin, target, words);
+    
+        return answer;
     }
     
-    public int bfs(String begin, String target, String[] words) {
-        boolean[] visited = new boolean[words.length];
+    public int findWord(String begin, String target, String[] words) {
+        boolean[] checked = new boolean[words.length];
+        ArrayDeque<Node> wordList = new ArrayDeque<>();
+        int result = Integer.MAX_VALUE;
+            
+        wordList.offer(new Node(begin, 0));
         
-        ArrayDeque<Count> q = new ArrayDeque<>();
-        
-        q.offerFirst(new Count(begin, 0, -1));
-        
-        while(!q.isEmpty()) {
-            Count v = q.pollFirst();
+        while(!wordList.isEmpty()) {
+            Node node = wordList.poll();
             
-            if(checkAnswer(v.s, target)){
-                return v.t;
-            }
-            checkedDifference(words, v, q, visited);           
-        }
-        
-        return 0;
-    }
-    
-    public boolean checkAnswer(String a, String b) {
-            String[] aa = a.split("");
-            
-            String[] bb = b.split("");
-            
-            for(int k=0; k<aa.length; k++) {
-                if(!aa[k].equals(bb[k])) return false;
-            }
-        return true;
-    }
-    
-    public void checkedDifference (String[] words, Count v, ArrayDeque<Count> c, boolean[] visited) {
-        
-        for(int i=0; i<words.length; i++) {
-            if(visited[i]) continue;
-            String[] ss = words[i].split("");
-            
-            String[] b = v.s.split("");
-            
-            int differCount = 0;
-            
-            for(int k=0; k<b.length; k++) {
-                if(!b[k].equals(ss[k])) differCount += 1;
+            if(target.equals(node.word)) {
+                result = Math.min(node.cost, result);
             }
             
-            if(differCount <= 1) {
-                c.offerLast(new Count(words[i], v.t + 1, differCount));
-                visited[i] = true;
+            for(int i=0; i<words.length; i++) {
+                if(!checked[i] && checkWordDiffCount(words[i], node.word)){
+                    checked[i] = true;
+                    wordList.offer(new Node(words[i], node.cost + 1));
+                }
             }
         }
+        
+        return result == Integer.MAX_VALUE ? 0 : result;
     }
+    
+    public boolean checkWordDiffCount(String word, String nodeWord){
+        int diffCnt = 0;
+        
+        String[] splitWord = word.split("");
+        String[] splitNodeWord = nodeWord.split("");
+        
+        for(int i=0; i<splitWord.length; i++) {
+            if(!splitWord[i].equals(splitNodeWord[i])) {
+                diffCnt += 1;
+            }
+        }
+        
+        return diffCnt > 1 ? false : true;
+    }
+    
 }
-    
